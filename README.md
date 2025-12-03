@@ -1,119 +1,119 @@
-# DMCP: CP2514 – Voice-guided 3D Solar System Navigation
+Dưới đây là file `README.md` chuyên nghiệp bằng tiếng Anh, mô tả đầy đủ kiến trúc dự án, cách cài đặt và sử dụng dựa trên source code bạn đã cung cấp.
 
-## Project Overview
-This project is a **voice-controlled 3D Solar System simulator** built in **Unity**, with a **Python backend using Vosk** for speech recognition. Users can navigate the solar system by voice commands, zoom in/out, change rotation speed, and get planet information. Supports **English and Vietnamese** commands.
+Bạn có thể tạo một file tên là `README.md` trong thư mục gốc của dự án và dán nội dung này vào.
 
-**Features:**
-- **Voice Navigation:** Move the camera to planets by saying their names.
-- **Zoom Control:** `"zoom in/out"` or `"phóng to/thu nhỏ"`.
-- **Rotation Speed Control:** `"speed up/slow down"` or `"tăng tốc/giảm tốc"`.
-- **Planet Info Display:** Each planet has a `PlanetInfo` component with name, description, diameter, moons.
-- **TCP/JSON Communication:** Python backend sends parsed commands to Unity in real-time.
-- **Expandable:** Tour mode, quizzes, TTS narration, particle effects, camera fly-through.
+-----
 
----
+# Voice-Guided 3D Navigation
 
-## Project Structure
+A voice-controlled 3D simulation where a user can command an agent to navigate a complex environment using natural language. This project integrates **Unity** for the 3D frontend and **Python (Vosk)** for offline speech recognition, communicating via **TCP Sockets**.
+
+## 🚀 Features
+
+  * **Offline Speech Recognition:** Uses the Vosk API to process voice commands without an internet connection.
+  * **Real-time TCP Communication:** Seamless low-latency data transmission between the Python server and Unity client.
+  * **Smart Navigation:** Utilizes Unity's NavMesh system for intelligent pathfinding.
+  * **Context-Aware Commands:** The system parses natural language (e.g., "Go to the table", "Approach the chair") and maps them to specific 3D objects.
+
+## 🛠 Tech Stack
+
+  * **Frontend:** Unity 6 (or 2022+), AI Navigation Package.
+  * **Backend:** Python 3.x.
+  * **Speech Engine:** Vosk (Kaldi-based).
+  * **Communication:** TCP/IP Sockets (Localhost).
+
+## 📂 Project Structure
 
 ```
-
-DMCP-VoiceSolarSystem/
-│
-├─ Unity/
-│   ├─ Assets/
-│   │   ├─ Models/          # FBX/GLTF Solar System model
-│   │   ├─ Scripts/
-│   │   │   ├─ CameraController.cs
-│   │   │   ├─ RotationController.cs
-│   │   │   ├─ TcpListenerUnity.cs
-│   │   │   └─ PlanetInfo.cs
-│   │   └─ Scenes/
-│   │       └─ SolarSystemScene.unity
-│
-├─ PythonBackend/
-│   ├─ voice_server.py       # Vosk + Python TCP server
-│   └─ models/               # Vosk models (EN & VN)
-│
-└─ README.md
-
-````
-
----
-
-## Getting Started
-
-### 1. Unity Setup
-1. Import Solar System 3D model (FBX/GLTF) into Unity.
-2. Create `PlanetsRoot` empty GameObject and add all planets under it.
-3. Assign `PlanetInfo` script to each planet and fill in `displayName`, `description`, `diameterKm`, `moons`.
-4. Add `CameraController`, `RotationController`, and `TcpListenerUnity` to a GameObject (`CameraRig`).
-5. Ensure camera's clear color is black and `MainCamera` is assigned.
-
----
-
-### 2. Python Backend
-1. Install dependencies:
-
-```bash
-pip install vosk sounddevice pyttsx3
-````
-
-2. Download Vosk model for English or Vietnamese:
-
-```text
-models/vosk-model-small-en-us-0.15
-models/vosk-model-small-vn-0.22
+├── UnityProject/
+│   ├── Assets/Scripts/
+│   │   ├── SpeechClient.cs          # TCP Client receiving text from Python
+│   │   ├── VoiceCommandProcessor.cs # Parses text and triggers navigation
+│   │   ├── NavigationController.cs  # Wrapper for NavMeshAgent logic
+│   │   ├── ObjectRegistry.cs        # Manages interactable scene objects
+│   │   └── ObjectAnchor.cs          # Defines object keywords (e.g., "table")
+│   └── ...
+├── PythonServer/
+│   ├── voice_server.py              # Captures audio & runs Vosk inference
+│   ├── vosk-model-small-en-us-0.15/ # The generic language model
+│   └── ...
 ```
 
-3. Run the voice server:
+## ⚙️ Installation & Setup
 
-```bash
-python voice_server.py
-```
+### 1\. Python Backend (Speech Server)
 
-It will listen to your microphone, parse commands, and send JSON to Unity.
+**Prerequisites:**
 
----
+  * Python 3.x installed.
+  * A microphone connected.
 
-### 3. Integration
+**Steps:**
 
-* Unity `TcpListenerUnity.cs` connects to Python TCP server.
-* Commands received in JSON format, e.g.:
+1.  Install required libraries:
+    ```bash
+    pip install vosk sounddevice
+    ```
+2.  Download a Vosk model (e.g., `vosk-model-small-en-us-0.15`) from [Vosk Models](https://alphacephei.com/vosk/models).
+3.  Extract the model into the same folder as `voice_server.py`.
+4.  Run the server:
+    ```bash
+    python voice_server.py
+    ```
+    *Wait until you see: `Đang chờ Unity kết nối...`*
 
-```json
-{"command":"goto_planet","planet":"sao hoa"}
-{"command":"zoom_in"}
-{"command":"speed_up"}
-```
+### 2\. Unity Frontend
 
-* CameraController handles zooming and moving to planet.
-* RotationController handles planetary rotation speed.
-* PlanetInfo can optionally trigger TTS or UI display.
+**Prerequisites:**
 
----
+  * Unity Hub & Editor installed.
+  * **AI Navigation** package installed (via Package Manager).
 
-## Example Voice Commands
+**Steps:**
 
-| Command                   | Action                               |
-| ------------------------- | ------------------------------------ |
-| phóng to / zoom in        | Zoom in camera                       |
-| thu nhỏ / zoom out        | Zoom out camera                      |
-| tới Sao Hỏa / go to Mars  | Move camera to Mars                  |
-| tăng tốc / speed up       | Increase rotation speed              |
-| giảm tốc / slow down      | Decrease rotation speed              |
-| bắt đầu tour / start tour | Automatic tour mode (future feature) |
+1.  Open the project in Unity.
+2.  **Important:** Setup the Navigation Mesh.
+      * Select the **Plane** (Environment floor).
+      * Add the `NavMeshSurface` component.
+      * Click **Bake** to generate the blue navigation map.
+3.  Ensure your `GameManager` object has the `SpeechClient`, `VoiceCommandProcessor`, and `ObjectRegistry` scripts attached and linked correctly in the Inspector.
+4.  Press **Play**.
 
----
+## 🎮 How to Use
 
-## Team Roles
+1.  Start the Python server first.
+2.  Start the Unity scene.
+3.  Check the Console for the "Connected to Python" message.
+4.  Speak a command clearly into your microphone.
 
-* **Trần Trang Linh:** Unity setup, CameraController, PlanetInfo, scene configuration.
-* **Phạm Tùng Lâm:** Python backend, Vosk command parser, TCP server.
-* **Nguyễn Minh Huyền:** Unity TCP listener, RotationController, PlanetInfo integration.
+### Supported Commands
 
-**Deliverable:** Demo running with basic voice commands (goto planet, zoom, speed control).
+The system recognizes the following patterns:
 
----
+  * **Navigation:**
+      * *"Go to [object]"* (e.g., "Go to table")
+      * *"Move to [object]"*
+      * *"Approach [object]"*
+      * *Shortcut:* Just saying the object name (e.g., "Table") also works.
+  * **Control:**
+      * *"Stop"* (Immediately halts the character).
 
+## 🔧 Troubleshooting
+
+  * **Character doesn't move:**
+      * Ensure the NavMesh is baked (The floor should look blue in the Scene view).
+      * Check if the Player's Y position is slightly above the floor (not sinking).
+      * Verify the target object has the `ObjectAnchor` script and the correct keyword in the Inspector.
+  * **Unity not receiving text:**
+      * Ensure `voice_server.py` is running **before** you press Play in Unity.
+      * Check firewall settings for port `5000`.
+
+## Team role
+* Trần Trang Linh: Voice processing.
+* Phạm Tùng Lâm: Navigation processing.
+* Nguyễn Minh Huyền: Python-Unity connection, animation processing.
+## 📜 License
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+Copyright (c) 2025 Tran Trang Linh, Nguyen Minh Huyen, Pham Tung Lam
 
 
